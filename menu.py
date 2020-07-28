@@ -1,18 +1,13 @@
 
 from Applications import Application
 import json
-#importing Portfolio class from main
-
 import sys 
-
 imp=Application()
 to_Save= imp.userList
 
 class Menu:
- 
  def __init__(self):
     self.app = Application()
-
     self.options = {
 
       "1": self.app.add_user,
@@ -28,10 +23,7 @@ class Menu:
       "Q": self.app.quit
 
     }
-    
  def display_options(self):
-    #print out all options to console
-      
       print(""" 
             ************* MAIN MENU *************
              Welcome to Last Mile Stock Exchange! 
@@ -53,8 +45,6 @@ class Menu:
              *************************************
  
              """)
-
-
  def run(self):
     while True:
       self.display_options()
@@ -65,26 +55,3 @@ class Menu:
         action()
       else:
         print("{0} is not a valid option, Please try again".format(option))
-    
-
- #def quit(self):
-   
-  
-    # self.app = Application()
-    #save_dict= {}
-   #list_of_users = self.save.userList
-   #print(to_save)
-
-   #choice = input("Would you like to save all changes (y/n): ")
-   #if choice == 'y' or choice== 'Y':
-     #with open ("list_of_users.txt", "w+") as json_file:
-       #json.dump(list_of_users,json_file)
-    # print("Your changes have been saved!")
-
-    # else:
-    #   print("Your changes will not be saved")
-    # sys.exit(0)
-    
-
-
- 
