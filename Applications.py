@@ -19,6 +19,9 @@ class Application:
   def __init__(self):
     self.ID=1
     self.userList=[] #dictionary of accounts (connects with portfolio)
+  
+  # def from_json(cls, data):
+  #       return cls(**data)
 
 
   def add_user(self):
@@ -46,6 +49,7 @@ class Application:
   
 
   def update_user(self):
+    
     if self.userList == []:
       print("There are no accounts to update!")
     else:
@@ -59,7 +63,9 @@ class Application:
           self.userList[int(acc_id)-1]=Users_C(user_name,Prin,acc_id)
           return print(f"Your updated username is : \"{user_name}\"")
       except ValueError:
-        print("Please enter a valid number!")
+          print("Please enter a valid number!")
+      
+
 
   def show_user(self):
     if self.userList == []:
@@ -89,22 +95,21 @@ class Application:
 
   def save(self,user_List):
     
-    # with open('list_of_users.txt', 'w') as output_file:
-    #   output_file.write(str(user_List))
+    # #json_object = json.dumps(user_List)
+    # #json_format = list(json_object)
+    # print (type(self.userList))
+     with open('list_of_users.json', 'w') as output_file:
+        
+        new =json.dumps(user_List,default=lambda o: o.__dict__, sort_keys=True, indent= 4)
+        json.dump(new,output_file)
 
-    
-    with open('list_of_users.json', 'w') as output_file:
-      output_file.dump(user_List)
-
-        # for s in user_List:
-        #   output_file.write(s+ "\n")
- 
-
+        # decoded_info= self.from_json(json.loads(new))
+        # print(decoded_info)
   def quit(self):
     # print("DSDSdS" + self.userList[0])
     list_of_users = self.userList
 
-    print(list_of_users)
+    #print(list_of_users)
     #list_of_users=self.show_user()
 
     choice = input("Would you like to save all changes (y/n): ")
@@ -195,7 +200,7 @@ class Application:
       if quant == 1:
         print('You now have '+ str(quant) + ' share of ' +str(stock_symbol).upper() + " and $" + str(user.cash)+ " in cash left in your account\n")
       else:
-        print('You now have '+ str(quant) + ' shares of ' +str(stock_symbol).upper() + " and $" + str(user.cash)+ " in cash left in your account\n")
+        print('You now have '+ str(quant) + ' shares of ' +str(stock_symbol).upper() + " and $" + str(user.cash)+ " in cash left in your account!\n")
        
     
     #print(user.port)
@@ -210,7 +215,32 @@ class Application:
 
     
   def sell_stock(self, user):
-    pass
+    print("This is your current portfolio: ")
+    for key in user.port:
+      if user.port[key][0] > 1:
+        print(str(user.port[key][0]) + " shares of " + key.upper() +  " worth " + str(user.port[key][1]) +" each.")
+      else:
+        print(str(user.port[key][0]) + " share of " + key.upper() +  " worth " + str(user.port[key][1]) +" each.")
+    stock= input("\nWhich stock would you like to sell? ")
+  
+    if stock in user.port:
+      quant=int(input("How many of those shares would you like to sell? "))
+      if quant > user.port[stock][0] or quant <0:
+        print("You can only sell" + user.port[stock][0])
+      else:
+        new= user.port[stock][0] - quant
+        user.port[stock][0]= new
+        surplus= user.port[stock][1]*quant
+        user.cash=user.cash + surplus
+        if quant==1:
+          print("You have now sold " + str(quant) + " share of " + stock.upper() + " and" + " $" + str(surplus)+ " has been added to your account")
+        else:
+          print("You have now sold " + str(quant) + " shares of " + stock.upper() + " and" + " $" + str(surplus)+ " has been added to your account")
+
+    else:
+      print("You do not own that stock!")
+    
+   
 
     
     # if user.port=[]:
@@ -233,22 +263,25 @@ class Application:
 
   def check_portfolio(self, user):
     print(f"\nInitial investment ${user.initial_investment}")
-    print (f"Current cash in the account: ${user.cash}")
+    print (f"Current cash in the account: $" + str(round(user.cash, 2)))
     print("________________________________")
-    print(f"Account's stock portfolio: ")
-    for key in user.port:
-      if user.port[key][0] > 1:
-        print(str(user.port[key][0]) + " stocks of " + key.upper() +  " worth " + str(user.port[key][1]) +" each.")
-      else:
-        print(str(user.port[key][0]) + " stock of " + key.upper() +  " worth " + str(user.port[key][1]) +" each.")
-    print('\n')
+    if len(user.port) ==0 :
+      print("There are no stock investments currently in the portfolio.\n")
+    else:
+      print(f"Account's stock portfolio: ")
+      for key in user.port:
+        if user.port[key][0] > 1:
+          print(str(user.port[key][0]) + " shares of " + key.upper() +  " worth " + str(user.port[key][1]) +" each.")
+        else:
+          print(str(user.port[key][0]) + " share of " + key.upper() +  " worth " + str(user.port[key][1]) +" each.")
+      print('\n')
    
     #  2 of stocks and multiply the value we get from the api
     #   #cash in the account + stocks value
       
 
   def changes(self, user):
-    changes = user.initial_investment - user.initial_investment / user.initial_investment
+    changes = user.cash - user.initial_investment / user.initial_investment
     print(f"your initial investment was {user.initial_investment}")
     print(f"your change in accouunt balance is: ")
     print (changes)

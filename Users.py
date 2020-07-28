@@ -12,4 +12,4 @@ class Users_C:
     #return (user_name,initial_investment,ID_num,initial_investment)
 
   def __str__(self):
-    return f"Username: \"{self.user_name}\" | UserID:#{self.ID_num} | Initial Investment Value: ${self.initial_investment} "
+    return (f"Username: \"{self.user_name}\" | UserID:#{self.ID_num} | Initial Investment Value: $" + f"{self.initial_investment:,.2f}") 
