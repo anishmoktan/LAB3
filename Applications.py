@@ -18,13 +18,10 @@ class Application:
       
   def __init__(self):
     self.ID=1
-    self.userList=[] #list of users (connects with portfolio)
+    self.userList=[] #dictionary of accounts (connects with portfolio)
 
 
   def add_user(self):
-
-    
-
     account_name = input(str(f"What is the name of the user? : "))
     # current_users=[]
 
@@ -40,8 +37,8 @@ class Application:
 
     ID = self.ID
     invest_amount = float(input("What amount would you like to start investing? : "))
-    user_info = Users_C(account_name, invest_amount, ID)
-    self.userList.append(user_info)
+    user_input = Users_C(account_name, invest_amount, ID)
+    self.userList.append(user_input)
     print("\nAccount created!\nYour username is \""+ str(account_name) + "\" and your personal user id is \"" + str(ID) + "\"")
     self.ID +=1
     
@@ -82,25 +79,37 @@ class Application:
       print("There are no more accounts to delete!")
     else: 
       user_id = int(input(f"Enter the ID of the user to delete: \n")) ##Add test here
-      user_id = user_id - 1
-      self.userList.pop(user_id)
-      print(f"User Deleted!")
-      self.show_user()
+      if(user_id > len(self.userList)):
+        print('Please enter a valid user ID!')
+      else:
+        user_id = user_id - 1
+        self.userList.pop(user_id)
+        print(f"User Deleted!")
+        self.show_user()
 
-  def save(self):
-    with open('data.json', 'w') as output_file:
-      json.dump(python_data, output_file, indent=4) 
+  def save(self,user_List):
+    
+    # with open('list_of_users.txt', 'w') as output_file:
+    #   output_file.write(str(user_List))
+
+    
+    with open('list_of_users.json', 'w') as output_file:
+      output_file.dump(user_List)
+
+        # for s in user_List:
+        #   output_file.write(s+ "\n")
+ 
 
   def quit(self):
     # print("DSDSdS" + self.userList[0])
-    list_of_users = str(self.userList)
+    list_of_users = self.userList
 
     print(list_of_users)
-    list_of_users=self.show_user()
+    #list_of_users=self.show_user()
 
     choice = input("Would you like to save all changes (y/n): ")
     if choice == 'y' or choice== 'Y':
-      self.save(userList)
+      self.save(list_of_users)
     sys.exit(0)
     
   def sign_in(self):
@@ -112,21 +121,20 @@ class Application:
         print('That user ID does not exist!')
       else:
         opened_acc=self.userList[int(User_ID)-1]
-        print("Welcome "+ opened_acc.user_name)
+        print("\nWelcome "+ opened_acc.user_name + '!')
       #return(self.inMenu())   
         print("""
         Choose from the options below
         "1": Search stock
         "2": Buy Stock
         "3": Sell Stock
-        "4": Check Net Worth
-        "5": View Changes
-        "6": Return to menu
+        "4": Check Portfolio
+        "5": Return to menu
               """)
         x = int(input("enter: "))
 
         if x==1:
-          self.search_stock()
+          self.search_stock(opened_acc)
           return(self.sign_in())
         elif x==2:
           self.buy_stock(opened_acc)
@@ -135,10 +143,7 @@ class Application:
           self.sell_stock(opened_acc)
           return(self.sign_in())
         elif x ==4:
-          self.check_current_net_worth(opened_acc)
-          return(self.sign_in())
-        elif x == 5:
-          self.changes(opened_acc)
+          self.check_portfolio(opened_acc)
           return(self.sign_in())
         else:
           return
@@ -158,39 +163,17 @@ class Application:
       
         
 
-  def search_stock(self):
+  def search_stock(self,user):
     stock_symbol = input("Please enter the Stock Ticker: ")
-    stock_symbol= stock_symbol.upper()
-    base_url  = "https://www.alphavantage.co/query?"
-    key = os.getenv('api_key')
-    query_params = {"function": "TIME_SERIES_INTRADAY" , "symbol": stock_symbol, "interval": "5min", "apikey": key}
-
-    response = requests.get(base_url, query_params)
-    # response.status_code
-    if response.status_code == 200:
-        print('We were able to find the value of the stock!')
-    elif response.status_code == 404:
-        print('Sorry we could not find the stock you were looking for')
-        return(self.search_stock)
-        
-    #error handling return out of the function
-
-
-
-    data = response.json()
-
-    last_referesh = data['Meta Data']["3. Last Refreshed"]
-    # print(last_referesh)
-    print("current market price for " + " " + stock_symbol + " "+ " stock is currently")
-    print (data["Time Series (5min)"][last_referesh]["1. open"])
+    try:
+      stock= search_stock(stock_symbol)
+    except KeyError:
+      print("That stock does not exist. Please enter a valid stock ticker!\n")
+      return
+ 
     
-    user.current_price =  data["Time Series (5min)"][last_referesh]["1. open"]
-    
-
-
-
   def buy_stock(self,user):
-    user.initial_investment = user.cash
+    #user.initial_investment = user.cash
     print("You currently have $" +str(user.cash)+ " available to spend in your account")
     stock_symbol = input("Please enter the Stock Ticker: ")
     try:
@@ -199,21 +182,21 @@ class Application:
       print("That stock does not exist. Please enter a valid stock ticker!\n")
       return
 
-      
-
-    stock_price=stock.value
-    quant= int(input("\nHow many of this stock would you like to purchase? : "))
+    stock_price=stock.value #price got from search_stock class
+    quant= int(input("How many of this stock would you like to purchase? : "))
 
             # new_cash= user. = user.cash - (quant*stock_price)
 
     if (quant*stock_price) > user.cash:
       print('You do not have enough cash to complete your purchase.')
     else:
-      user.stock_cost_price = quant*stock_price
-      user.nash=user.cash - (quant*stock_price)
-      user.cash=user.nash
-      user.port[stock_symbol]=[quant,stock_price]
-      print('You now have '+ str(quant) + ' share(s) of ' +str(stock_symbol)+ " and $" + str(user.cash)+ " in cash left in your account \n") 
+      user.cash=user.cash - (quant*stock_price)
+      user.port[stock_symbol]=[quant,stock_price] #Stores it to portfolio dictionary
+      if quant == 1:
+        print('You now have '+ str(quant) + ' share of ' +str(stock_symbol).upper() + " and $" + str(user.cash)+ " in cash left in your account\n")
+      else:
+        print('You now have '+ str(quant) + ' shares of ' +str(stock_symbol).upper() + " and $" + str(user.cash)+ " in cash left in your account\n")
+       
     
     #print(user.port)
     
@@ -228,6 +211,14 @@ class Application:
     
   def sell_stock(self, user):
     pass
+
+    
+    # if user.port=[]:
+    #   print("This account does not have any investment in the portfolio!")
+    # else:
+    #   print("These are the current stocks in the portfolio")
+    #   for stocks in user.port:
+    #     print(user)
   #  print(f"you currently have {user.cash} in your account")
   #  print(f"you have {user.stock_cost_price} invested in the market" )
 
@@ -240,10 +231,18 @@ class Application:
  
 
 
-  def check_current_net_worth(self, user):
-    print(f"your initial investment was {user.initial_investment}")
-    print ( f"you have {user.cash} dollars in your account remaining in ")
-    print(f"you have a total of {user.stock_cost_price} invested in the market")
+  def check_portfolio(self, user):
+    print(f"\nInitial investment ${user.initial_investment}")
+    print (f"Current cash in the account: ${user.cash}")
+    print("________________________________")
+    print(f"Account's stock portfolio: ")
+    for key in user.port:
+      if user.port[key][0] > 1:
+        print(str(user.port[key][0]) + " stocks of " + key.upper() +  " worth " + str(user.port[key][1]) +" each.")
+      else:
+        print(str(user.port[key][0]) + " stock of " + key.upper() +  " worth " + str(user.port[key][1]) +" each.")
+    print('\n')
+   
     #  2 of stocks and multiply the value we get from the api
     #   #cash in the account + stocks value
       

@@ -13,16 +13,17 @@ class search_stock:
       response = requests.get(base_url, query_params)
       # response.status_code
       if response.status_code == 200:
-          print('We were able to find the value of the stock!')
+          print('\nWe were able to find the value of the stock!')
       elif response.status_code == 404:
           print('Sorry we could not find the stock you were looking for')
           return(self.search_stock)
 
       data = response.json()
       last_referesh = data['Meta Data']["3. Last Refreshed"]
-      # print(last_referesh)
+ 
       self.value= float(data["Time Series (5min)"][last_referesh]["1. open"])
-      print("The market price for" + " " + stock_symbol + " "+ "stock is currently $" + str(self.value))
+
+      print("The market price for" + " " + stock_symbol + " "+ "stock is currently $" + str(self.value) + "\n")
 
     
       
