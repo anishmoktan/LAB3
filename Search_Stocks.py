@@ -4,7 +4,7 @@ import os
 
 class search_stock:
   def __init__(self,stock_symbol):
-      stock_symbol= stock_symbol.upper()
+      stock_symbol = stock_symbol.upper()
       base_url  = "https://www.alphavantage.co/query?"
       key = os.getenv('api_key')
       query_params = {"function": "TIME_SERIES_INTRADAY" , "symbol": stock_symbol, "interval": "5min", "apikey": key}

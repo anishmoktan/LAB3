@@ -38,11 +38,14 @@ class Menu:
 
              4. Delete account(s)
 
-             5. Sign in to your account
-
              Q. Quit
 
              *************************************
+
+             5. Sign in to your account
+
+             *************************************
+
  
              """)
  def run(self):

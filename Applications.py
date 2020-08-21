@@ -1,10 +1,8 @@
-import pickle
-import json
 from Users import Users_C
 from Search_Stocks import search_stock
-import requests
-import os
 import sys
+import json
+import os
 
 class Application:
       
@@ -33,7 +31,7 @@ class Application:
           user_name = str(input("What is the new account username? : "))
           Prin= float(input("What is the new invesment amount in the account? : "))
           self.userList[int(acc_id)-1]=Users_C(user_name,Prin,acc_id)
-          return print(f"Your updated username is : \"{user_name}\"")
+          return print(f"Your updated username is : \"{user_name}\"") 
       except ValueError:
           print("Please enter a valid number!")
       
@@ -67,13 +65,16 @@ class Application:
      with open('list_of_users.json', 'w') as output_file:
         new =json.dumps(user_List,default=lambda o: o.__dict__, sort_keys=True, indent= 4)
         json.dump(new,output_file)
+        
   def quit(self):
     list_of_users = self.userList
     choice = input("Would you like to save all changes (y/n): ")
     if choice == 'y' or choice== 'Y':
       self.save(list_of_users)
     sys.exit(0)
-    
+
+
+
   def sign_in(self):
     if self.userList== []:
       print("There are no users in the application!")
@@ -160,6 +161,10 @@ class Application:
           print("You have now sold " + str(quant) + " shares of " + stock.upper() + " and" + " $" + str(surplus)+ " has been added to your account")
     else:
       print("You do not own that stock!")
+
+
+
+
   def check_portfolio(self, user):
     print(f"\nInitial investment ${user.initial_investment}")
     print (f"Current cash in the account: $" + str(round(user.cash, 2)))
@@ -174,6 +179,8 @@ class Application:
         else:
           print(str(user.port[key][0]) + " share of " + key.upper() +  " worth " + str(user.port[key][1]) +" each.")
       print('\n')
+
+
   def changes(self, user):
     changes = user.cash - user.initial_investment / user.initial_investment
     print(f"your initial investment was {user.initial_investment}")
